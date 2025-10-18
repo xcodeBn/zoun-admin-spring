@@ -1,27 +1,193 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{zoun-admin-ui/layout :: layout}">
 <head>
-    <title th:text="'Zoun Admin - ' + ${modelName}"></title>
+    <title th:text="${isEdit ? 'Edit' : 'Create'} + ' ' + ${modelName}">Form</title>
 </head>
 <body>
-    <h1 th:text="(${entity.id == null} ? 'Create' : 'Edit') + ' ' + ${modelName}"></h1>
-    <form th:action="@{${T(io.xcodebn.zounadminspring.web.UrlUtils).generateUrl(adminUIProperties.getBasePath(), '/models/' + modelName + '/save')}}" th:object="${entity}" method="post">
-        <input type="hidden" th:field="*{id}" />
-        <div th:each="field : ${fieldMetadata}">
-            <label th:for="${field.name}" th:text="${field.name}"></label>
-            <div th:switch="${field.type}">
-                <input th:case="'String'" type="text" th:field="*{__${field.name}__}" />
-                <input th:case="'Integer'" type="number" th:field="*{__${field.name}__}" />
-                <input th:case="'Long'" type="number" th:field="*{__${field.name}__}" />
-                <input th:case="'Boolean'" type="checkbox" th:field="*{__${field.name}__}" />
-                <div th:case="'Association'">
-                    <!-- TODO: Handle association -->
-                    <input type="text" th:field="*{__${field.name}__}" />
+
+<div th:fragment="content">
+    <!-- Header -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white"
+            th:text="${isEdit ? 'Edit' : 'Create New'} + ' ' + ${modelName}">
+            Create Entity
+        </h1>
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            Fill in the form below to <span th:text="${isEdit ? 'update' : 'create'}">create</span> a record
+        </p>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+        <form th:action="@{'/zoun-admin/models/' + ${modelName} + '/save'}"
+              method="post"
+              enctype="multipart/form-data"
+              class="space-y-6">
+
+            <!-- Hidden ID field for updates -->
+            <input th:if="${entity != null and #fields.hasField(entity, 'id')}"
+                   type="hidden"
+                   name="id"
+                   th:value="${#fields.getField(entity, 'id')}" />
+
+            <!-- Dynamic fields based on metadata -->
+            <div th:each="field : ${fields}"
+                 th:if="${field.isVisible() and !field.isId()}"
+                 class="form-field">
+
+                <label th:for="${field.name()}"
+                       th:text="${field.displayLabel}"
+                       class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Field Label
+                </label>
+
+                <!-- STRING field -->
+                <div th:if="${field.fieldType().name() == 'STRING'}">
+                    <input type="text"
+                           th:id="${field.name()}"
+                           th:name="${field.name()}"
+                           th:value="${entity != null ? #fields.getField(entity, field.name()) : ''}"
+                           th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull)) or field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotBlank))}"
+                           th:readonly="${field.isReadOnly()}"
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
                 </div>
-                <input th:case="*" type="text" th:field="*{__${field.name}__}" />
+
+                <!-- INTEGER/LONG field -->
+                <div th:if="${field.fieldType().name() == 'INTEGER' or field.fieldType().name() == 'LONG'}">
+                    <input type="number"
+                           th:id="${field.name()}"
+                           th:name="${field.name()}"
+                           th:value="${entity != null ? #fields.getField(entity, field.name()) : ''}"
+                           th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull))}"
+                           th:readonly="${field.isReadOnly()}"
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+                </div>
+
+                <!-- DOUBLE/FLOAT field -->
+                <div th:if="${field.fieldType().name() == 'DOUBLE' or field.fieldType().name() == 'FLOAT'}">
+                    <input type="number"
+                           step="0.01"
+                           th:id="${field.name()}"
+                           th:name="${field.name()}"
+                           th:value="${entity != null ? #fields.getField(entity, field.name()) : ''}"
+                           th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull))}"
+                           th:readonly="${field.isReadOnly()}"
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+                </div>
+
+                <!-- BOOLEAN field -->
+                <div th:if="${field.fieldType().name() == 'BOOLEAN'}">
+                    <div class="flex items-center">
+                        <input type="checkbox"
+                               th:id="${field.name()}"
+                               th:name="${field.name()}"
+                               th:checked="${entity != null and #fields.getField(entity, field.name())}"
+                               th:disabled="${field.isReadOnly()}"
+                               value="true"
+                               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                        <label th:for="${field.name()}"
+                               th:text="'Enable ' + ${field.displayLabel}"
+                               class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Enable
+                        </label>
+                    </div>
+                </div>
+
+                <!-- DATE field -->
+                <div th:if="${field.fieldType().name() == 'DATE'}">
+                    <input type="date"
+                           th:id="${field.name()}"
+                           th:name="${field.name()}"
+                           th:value="${entity != null ? #fields.getField(entity, field.name()) : ''}"
+                           th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull))}"
+                           th:readonly="${field.isReadOnly()}"
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+                </div>
+
+                <!-- TIMESTAMP field -->
+                <div th:if="${field.fieldType().name() == 'TIMESTAMP'}">
+                    <input type="datetime-local"
+                           th:id="${field.name()}"
+                           th:name="${field.name()}"
+                           th:value="${entity != null ? #fields.getField(entity, field.name()) : ''}"
+                           th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull))}"
+                           th:readonly="${field.isReadOnly()}"
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+                </div>
+
+                <!-- ENUM field -->
+                <div th:if="${field.fieldType().name() == 'ENUM'}">
+                    <select th:id="${field.name()}"
+                            th:name="${field.name()}"
+                            th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull))}"
+                            th:disabled="${field.isReadOnly()}"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="">-- Select --</option>
+                        <option th:each="enumValue : ${field.type().getEnumConstants()}"
+                                th:value="${enumValue.name()}"
+                                th:text="${enumValue.name()}"
+                                th:selected="${entity != null and #fields.getField(entity, field.name()) == enumValue}">
+                            Option
+                        </option>
+                    </select>
+                </div>
+
+                <!-- MANY_TO_ONE / ONE_TO_ONE (relationship dropdown) -->
+                <div th:if="${field.fieldType().name() == 'MANY_TO_ONE' or field.fieldType().name() == 'ONE_TO_ONE'}">
+                    <select th:id="${field.name()}"
+                            th:name="${field.name()}"
+                            th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull))}"
+                            th:disabled="${field.isReadOnly()}"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="">-- Select --</option>
+                        <option th:each="option : ${relationshipOptions.get(field.name())}"
+                                th:value="${#fields.getField(option, 'id')}"
+                                th:text="${option.toString()}"
+                                th:selected="${entity != null and #fields.getField(entity, field.name()) != null and #fields.getField(#fields.getField(entity, field.name()), 'id') == #fields.getField(option, 'id')}">
+                            Related Entity
+                        </option>
+                    </select>
+                </div>
+
+                <!-- LOB (file upload) field -->
+                <div th:if="${field.fieldType().name() == 'LOB'}">
+                    <input type="file"
+                           th:id="${field.name()}"
+                           th:name="${field.name()}"
+                           th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull)) and (entity == null or #fields.getField(entity, field.name()) == null)}"
+                           th:disabled="${field.isReadOnly()}"
+                           class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" />
+                    <p th:if="${entity != null and #fields.getField(entity, field.name()) != null}"
+                       class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Current file: <a th:href="@{'/zoun-admin/models/' + ${modelName} + '/file/' + ${#fields.getField(entity, 'id')} + '/' + ${field.name()}}"
+                                         class="text-blue-600 hover:underline dark:text-blue-400">Download</a>
+                    </p>
+                </div>
+
+                <!-- Validation hint -->
+                <p th:if="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.Size))}"
+                   th:with="sizeAnnotation=${field.validationAnnotations().get(T(jakarta.validation.constraints.Size))}"
+                   class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    <span th:if="${sizeAnnotation.min() > 0}">Min: <span th:text="${sizeAnnotation.min()}">0</span></span>
+                    <span th:if="${sizeAnnotation.max() < 2147483647}">Max: <span th:text="${sizeAnnotation.max()}">100</span></span>
+                </p>
             </div>
-        </div>
-        <button type="submit">Save</button>
-    </form>
+
+            <!-- Form Actions -->
+            <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <a th:href="@{'/zoun-admin/models/' + ${modelName}}"
+                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                    Cancel
+                </a>
+                <button type="submit"
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <span th:text="${isEdit ? 'Update' : 'Create'}">Save</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 </body>
 </html>
