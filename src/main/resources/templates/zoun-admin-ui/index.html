@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Zoun Admin</title>
+</head>
+<body>
+    <h1>Zoun Admin Dashboard</h1>
+    <ul>
+        <li th:each="model : ${models}">
+            <a th:href="@{${T(io.xcodebn.zounadminspring.web.UrlUtils).generateUrl(adminUIProperties.getBasePath(), '/models/' + model)}}" th:text="${model}"></a>
+        </li>
+    </ul>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="'Zoun Admin - ' + ${modelName}"></title>
+</head>
+<body>
+    <h1 th:text="(${entity.id == null} ? 'Create' : 'Edit') + ' ' + ${modelName}"></h1>
+    <form th:action="@{${T(io.xcodebn.zounadminspring.web.UrlUtils).generateUrl(adminUIProperties.getBasePath(), '/models/' + modelName + '/save')}}" th:object="${entity}" method="post">
+        <input type="hidden" th:field="*{id}" />
+        <div th:each="field : ${fieldMetadata}">
+            <label th:for="${field.name}" th:text="${field.name}"></label>
+            <div th:switch="${field.type}">
+                <input th:case="'String'" type="text" th:field="*{__${field.name}__}" />
+                <input th:case="'Integer'" type="number" th:field="*{__${field.name}__}" />
+                <input th:case="'Long'" type="number" th:field="*{__${field.name}__}" />
+                <input th:case="'Boolean'" type="checkbox" th:field="*{__${field.name}__}" />
+                <div th:case="'Association'">
+                    <!-- TODO: Handle association -->
+                    <input type="text" th:field="*{__${field.name}__}" />
+                </div>
+                <input th:case="*" type="text" th:field="*{__${field.name}__}" />
+            </div>
+        </div>
+        <button type="submit">Save</button>
+    </form>
+</body>
+</html>

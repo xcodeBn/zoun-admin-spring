@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="'Zoun Admin - ' + ${modelName}"></title>
+</head>
+<body>
+    <h1 th:text="${modelName} + ' List'"></h1>
+    <a th:href="@{${T(io.xcodebn.zounadminspring.web.UrlUtils).generateUrl(adminUIProperties.getBasePath(), '/')}}">Back to Dashboard</a>
+    <br/>
+    <a th:href="@{${T(io.xcodebn.zounadminspring.web.UrlUtils).generateUrl(adminUIProperties.getBasePath(), '/models/' + modelName + '/new')}}">Create New</a>
+    <table>
+        <thead>
+            <tr>
+                <th th:each="field : ${fieldMetadata}" th:text="${field.name}"></th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="entity : ${page.content}">
+                <td th:each="field : ${fieldMetadata}" th:text="${T(io.xcodebn.zounadminspring.web.ReflectionUtils).getFieldValue(entity, field.name)}"></td>
+                <td>
+                    <a th:href="@{${T(io.xcodebn.zounadminspring.web.UrlUtils).generateUrl(adminUIProperties.getBasePath(), '/models/' + modelName + '/edit/' + T(io.xcodebn.zounadminspring.web.ReflectionUtils).getObjectId(entity))}}">Edit</a>
+                    <form th:action="@{${T(io.xcodebn.zounadminspring.web.UrlUtils).generateUrl(adminUIProperties.getBasePath(), '/models/' + modelName + '/delete/' + T(io.xcodebn.zounadminspring.web.ReflectionUtils).getObjectId(entity))}}" method="post">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div>
+        <span th:if="${page.hasPrevious()}">
+            <a th:href="@{${T(io.xcodebn.zounadminspring.web.UrlUtils).generateUrl(adminUIProperties.getBasePath(), '/models/' + modelName + '?page=' + ${page.previousPageable().pageNumber} + '&size=' + ${page.size})}}">Previous</a>
+        </span>
+        <span th:text="'Page ' + ${page.number + 1} + ' of ' + ${page.totalPages}"></span>
+        <span th:if="${page.hasNext()}">
+            <a th:href="@{${T(io.xcodebn.zounadminspring.web.UrlUtils).generateUrl(adminUIProperties.getBasePath(), '/models/' + modelName + '?page=' + ${page.nextPageable().pageNumber} + '&size=' + ${page.size})}}">Next</a>
+        </span>
+    </div>
+</body>
+</html>
