@@ -21,23 +21,23 @@ A **zero-code** Spring Boot starter that automatically generates a complete, pro
 **Gradle (Kotlin DSL):**
 ```kotlin
 dependencies {
-    implementation("io.xcodebn:zoun-admin-spring-boot-starter:0.0.1-SNAPSHOT")
+    implementation("io.github.xcodebn:zoun-admin-spring:0.0.2")
 }
 ```
 
 **Gradle (Groovy):**
 ```groovy
 dependencies {
-    implementation 'io.xcodebn:zoun-admin-spring-boot-starter:0.0.1-SNAPSHOT'
+    implementation 'io.github.xcodebn:zoun-admin-spring:0.0.2'
 }
 ```
 
 **Maven:**
 ```xml
 <dependency>
-    <groupId>io.xcodebn</groupId>
-    <artifactId>zoun-admin-spring-boot-starter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <groupId>io.github.xcodebn</groupId>
+    <artifactId>zoun-admin-spring</artifactId>
+    <version>0.0.2</version>
 </dependency>
 ```
 
