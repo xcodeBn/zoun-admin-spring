@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{zoun-admin-ui/layout :: layout(~{::content})}">
+<head>
+    <title>Error</title>
+</head>
+<body>
+
+<div th:fragment="content">
+    <div class="max-w-2xl mx-auto text-center py-12">
+        <!-- Error Icon -->
+        <svg class="mx-auto h-16 w-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+
+        <!-- Error Message -->
+        <h1 class="mt-4 text-3xl font-bold text-gray-900 dark:text-white">
+            Oops! Something went wrong
+        </h1>
+
+        <p class="mt-2 text-lg text-gray-600 dark:text-gray-400"
+           th:text="${errorMessage ?: 'An unexpected error occurred'}">
+            Error message
+        </p>
+
+        <div th:if="${errorDetails}"
+             class="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-left">
+            <p class="text-sm font-mono text-gray-700 dark:text-gray-300"
+               th:text="${errorDetails}">
+                Error details
+            </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-8 flex items-center justify-center space-x-4">
+            <a href="javascript:history.back()"
+               class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg shadow transition">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Go Back
+            </a>
+
+            <a th:href="@{'/zoun-admin'}"
+               class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow transition">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                </svg>
+                Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

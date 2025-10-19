@@ -1,14 +1,67 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{zoun-admin-ui/layout :: layout(~{::content})}">
 <head>
-    <title>Zoun Admin</title>
+    <title>Dashboard</title>
 </head>
 <body>
-    <h1>Zoun Admin Dashboard</h1>
-    <ul>
-        <li th:each="model : ${models}">
-            <a th:href="@{${T(io.xcodebn.zounadminspring.web.UrlUtils).generateUrl(adminUIProperties.getBasePath(), '/models/' + model)}}" th:text="${model}"></a>
-        </li>
-    </ul>
+
+<div th:fragment="content">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            Manage your application entities
+        </p>
+    </div>
+
+    <!-- Entity Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div th:each="entry : ${models}"
+             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow hover:shadow-lg transition-shadow">
+
+            <a th:href="@{'/zoun-admin/models/' + ${entry.key}}"
+               class="block p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900">
+                        <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2"
+                    th:text="${entry.value.displayName}">
+                    Entity Name
+                </h2>
+
+                <p class="text-sm text-gray-500 dark:text-gray-400"
+                   th:text="${entry.value.entityClass.simpleName}">
+                    EntityClass
+                </p>
+
+                <div class="mt-4 flex items-center text-blue-600 dark:text-blue-400 text-sm font-medium">
+                    <span>Manage</span>
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${models == null or models.isEmpty()}"
+         class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No entities found</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            No JPA entities were discovered in your application.
+        </p>
+    </div>
+</div>
+
 </body>
 </html>
