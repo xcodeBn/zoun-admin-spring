@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.xcodebn"
-version = "0.0.1"
+version = "0.0.2"
 description = "zoun-admin-spring"
 
 java {
@@ -55,7 +55,7 @@ mavenPublishing {
     coordinates(
         groupId = "io.github.xcodebn",
         artifactId = "zoun-admin-spring",
-        version = "0.0.1"
+        version = "0.0.2"
     )
 
     pom {

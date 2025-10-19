@@ -5,6 +5,7 @@ import io.xcodebn.demo.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -22,15 +23,18 @@ public class DataInitializer implements CommandLineRunner {
     private final EmployeeRepository employeeRepository;
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final Environment environment;
 
     public DataInitializer(DepartmentRepository departmentRepository,
                            EmployeeRepository employeeRepository,
                            CategoryRepository categoryRepository,
-                           ProductRepository productRepository) {
+                           ProductRepository productRepository,
+                           Environment environment) {
         this.departmentRepository = departmentRepository;
         this.employeeRepository = employeeRepository;
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
+        this.environment = environment;
     }
 
     @Override
@@ -142,10 +146,12 @@ public class DataInitializer implements CommandLineRunner {
 
         log.info("Created {} products", productRepository.count());
 
+        String port = environment.getProperty("server.port", "8080");
+
         log.info("Sample data initialization complete!");
         log.info("===================================================");
         log.info("Demo application is ready!");
-        log.info("Access the Zoun Admin panel at: http://localhost:8080/zoun-admin");
+        log.info("Access the Zoun Admin panel at: http://localhost:{}/zoun-admin", port);
         log.info("Login credentials:");
         log.info("  Username: admin");
         log.info("  Password: admin");

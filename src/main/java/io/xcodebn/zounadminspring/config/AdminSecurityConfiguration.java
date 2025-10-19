@@ -40,12 +40,12 @@ public class AdminSecurityConfiguration {
         String requiredRole = properties.getRequiredRole();
 
         http
-            // Only apply this security configuration to admin URLs
-            .securityMatcher(basePath + "/**")
+            // Only apply this security configuration to admin URLs (with and without trailing slash)
+            .securityMatcher(basePath, basePath + "/**")
 
             // Authorization rules
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(basePath + "/**")
+                .requestMatchers(basePath, basePath + "/**")
                 .hasRole(requiredRole)
             )
 

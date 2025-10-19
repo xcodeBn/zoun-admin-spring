@@ -27,13 +27,12 @@ tasks.withType<JavaCompile> {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
-    // Depend on the main zoun-admin-spring library from Maven Local
-    implementation("io.github.xcodebn:zoun-admin-spring:0.0.1-SNAPSHOT")
+    // Depend on the published zoun-admin-spring library from Maven Central
+    implementation("io.github.xcodebn:zoun-admin-spring:0.0.2")
 
     // Spring Boot starters
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
