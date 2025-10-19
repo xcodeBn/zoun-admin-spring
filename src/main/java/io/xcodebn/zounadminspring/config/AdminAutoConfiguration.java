@@ -25,22 +25,4 @@ public class AdminAutoConfiguration {
     public AdminAutoConfiguration() {
         log.info("Zoun Admin UI is enabled and initializing...");
     }
-
-    /**
-     * Register the AdminModelRegistry bean.
-     * This is already a @Service, but we can explicitly declare it here if needed.
-     */
-    @Bean
-    public AdminModelRegistry adminModelRegistry() {
-        return new AdminModelRegistry(null); // Will be injected by Spring
-    }
-
-    /**
-     * Register the EntityReflectionService bean.
-     * This is already a @Service, but we can explicitly declare it here if needed.
-     */
-    @Bean
-    public EntityReflectionService entityReflectionService() {
-        return new EntityReflectionService();
-    }
 }

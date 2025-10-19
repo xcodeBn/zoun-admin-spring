@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{zoun-admin-ui/layout :: layout}">
+      th:replace="~{zoun-admin-ui/layout :: layout(~{::content})}">
 <head>
     <title th:text="${isEdit ? 'Edit' : 'Create'} + ' ' + ${modelName}">Form</title>
 </head>
@@ -26,10 +26,10 @@
               class="space-y-6">
 
             <!-- Hidden ID field for updates -->
-            <input th:if="${entity != null and #fields.hasField(entity, 'id')}"
+            <input th:if="${entity != null and @reflectionHelper.getFieldValue(entity, 'id') != null}"
                    type="hidden"
                    name="id"
-                   th:value="${#fields.getField(entity, 'id')}" />
+                   th:value="${@reflectionHelper.getFieldValue(entity, 'id')}" />
 
             <!-- Dynamic fields based on metadata -->
             <div th:each="field : ${fields}"
@@ -47,8 +47,8 @@
                     <input type="text"
                            th:id="${field.name()}"
                            th:name="${field.name()}"
-                           th:value="${entity != null ? #fields.getField(entity, field.name()) : ''}"
-                           th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull)) or field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotBlank))}"
+                           th:value="${entity != null ? @reflectionHelper.getFieldValue(entity, field.name()) : ''}"
+                           th:required="${@reflectionHelper.hasValidationAnnotation(field, 'NotNull') or @reflectionHelper.hasValidationAnnotation(field, 'NotBlank')}"
                            th:readonly="${field.isReadOnly()}"
                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
                 </div>
@@ -58,8 +58,8 @@
                     <input type="number"
                            th:id="${field.name()}"
                            th:name="${field.name()}"
-                           th:value="${entity != null ? #fields.getField(entity, field.name()) : ''}"
-                           th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull))}"
+                           th:value="${entity != null ? @reflectionHelper.getFieldValue(entity, field.name()) : ''}"
+                           th:required="${@reflectionHelper.hasValidationAnnotation(field, 'NotNull')}"
                            th:readonly="${field.isReadOnly()}"
                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
                 </div>
@@ -70,8 +70,8 @@
                            step="0.01"
                            th:id="${field.name()}"
                            th:name="${field.name()}"
-                           th:value="${entity != null ? #fields.getField(entity, field.name()) : ''}"
-                           th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull))}"
+                           th:value="${entity != null ? @reflectionHelper.getFieldValue(entity, field.name()) : ''}"
+                           th:required="${@reflectionHelper.hasValidationAnnotation(field, 'NotNull')}"
                            th:readonly="${field.isReadOnly()}"
                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
                 </div>
@@ -82,7 +82,7 @@
                         <input type="checkbox"
                                th:id="${field.name()}"
                                th:name="${field.name()}"
-                               th:checked="${entity != null and #fields.getField(entity, field.name())}"
+                               th:checked="${entity != null and @reflectionHelper.getFieldValue(entity, field.name())}"
                                th:disabled="${field.isReadOnly()}"
                                value="true"
                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
@@ -99,8 +99,8 @@
                     <input type="date"
                            th:id="${field.name()}"
                            th:name="${field.name()}"
-                           th:value="${entity != null ? #fields.getField(entity, field.name()) : ''}"
-                           th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull))}"
+                           th:value="${entity != null ? @reflectionHelper.getFieldValue(entity, field.name()) : ''}"
+                           th:required="${@reflectionHelper.hasValidationAnnotation(field, 'NotNull')}"
                            th:readonly="${field.isReadOnly()}"
                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
                 </div>
@@ -110,8 +110,8 @@
                     <input type="datetime-local"
                            th:id="${field.name()}"
                            th:name="${field.name()}"
-                           th:value="${entity != null ? #fields.getField(entity, field.name()) : ''}"
-                           th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull))}"
+                           th:value="${entity != null ? @reflectionHelper.getFieldValue(entity, field.name()) : ''}"
+                           th:required="${@reflectionHelper.hasValidationAnnotation(field, 'NotNull')}"
                            th:readonly="${field.isReadOnly()}"
                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
                 </div>
@@ -120,14 +120,14 @@
                 <div th:if="${field.fieldType().name() == 'ENUM'}">
                     <select th:id="${field.name()}"
                             th:name="${field.name()}"
-                            th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull))}"
+                            th:required="${@reflectionHelper.hasValidationAnnotation(field, 'NotNull')}"
                             th:disabled="${field.isReadOnly()}"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                         <option value="">-- Select --</option>
                         <option th:each="enumValue : ${field.type().getEnumConstants()}"
                                 th:value="${enumValue.name()}"
                                 th:text="${enumValue.name()}"
-                                th:selected="${entity != null and #fields.getField(entity, field.name()) == enumValue}">
+                                th:selected="${entity != null and @reflectionHelper.getFieldValue(entity, field.name()) == enumValue}">
                             Option
                         </option>
                     </select>
@@ -137,14 +137,14 @@
                 <div th:if="${field.fieldType().name() == 'MANY_TO_ONE' or field.fieldType().name() == 'ONE_TO_ONE'}">
                     <select th:id="${field.name()}"
                             th:name="${field.name()}"
-                            th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull))}"
+                            th:required="${@reflectionHelper.hasValidationAnnotation(field, 'NotNull')}"
                             th:disabled="${field.isReadOnly()}"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                         <option value="">-- Select --</option>
                         <option th:each="option : ${relationshipOptions.get(field.name())}"
-                                th:value="${#fields.getField(option, 'id')}"
+                                th:value="${@reflectionHelper.getFieldValue(option, 'id')}"
                                 th:text="${option.toString()}"
-                                th:selected="${entity != null and #fields.getField(entity, field.name()) != null and #fields.getField(#fields.getField(entity, field.name()), 'id') == #fields.getField(option, 'id')}">
+                                th:selected="${entity != null and @reflectionHelper.getFieldValue(entity, field.name()) != null and @reflectionHelper.getFieldValue(@reflectionHelper.getFieldValue(entity, field.name()), 'id') == @reflectionHelper.getFieldValue(option, 'id')}"
                             Related Entity
                         </option>
                     </select>
@@ -155,19 +155,19 @@
                     <input type="file"
                            th:id="${field.name()}"
                            th:name="${field.name()}"
-                           th:required="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.NotNull)) and (entity == null or #fields.getField(entity, field.name()) == null)}"
+                           th:required="${@reflectionHelper.hasValidationAnnotation(field, 'NotNull') and (entity == null or @reflectionHelper.getFieldValue(entity, field.name()) == null)}"
                            th:disabled="${field.isReadOnly()}"
                            class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" />
-                    <p th:if="${entity != null and #fields.getField(entity, field.name()) != null}"
+                    <p th:if="${entity != null and @reflectionHelper.getFieldValue(entity, field.name()) != null}"
                        class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                        Current file: <a th:href="@{'/zoun-admin/models/' + ${modelName} + '/file/' + ${#fields.getField(entity, 'id')} + '/' + ${field.name()}}"
+                        Current file: <a th:href="@{'/zoun-admin/models/' + ${modelName} + '/file/' + ${@reflectionHelper.getFieldValue(entity, 'id')} + '/' + ${field.name()}}"
                                          class="text-blue-600 hover:underline dark:text-blue-400">Download</a>
                     </p>
                 </div>
 
                 <!-- Validation hint -->
-                <p th:if="${field.validationAnnotations().containsKey(T(jakarta.validation.constraints.Size))}"
-                   th:with="sizeAnnotation=${field.validationAnnotations().get(T(jakarta.validation.constraints.Size))}"
+                <p th:if="${@reflectionHelper.hasValidationAnnotation(field, 'Size')}"
+                   th:with="sizeAnnotation=${@reflectionHelper.getSizeAnnotation(field)}"
                    class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     <span th:if="${sizeAnnotation.min() > 0}">Min: <span th:text="${sizeAnnotation.min()}">0</span></span>
                     <span th:if="${sizeAnnotation.max() < 2147483647}">Max: <span th:text="${sizeAnnotation.max()}">100</span></span>

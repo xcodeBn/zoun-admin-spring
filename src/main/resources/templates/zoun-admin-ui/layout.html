@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout (content)">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,15 +7,39 @@
 
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
 
     <!-- Alpine.js for interactive components -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        // Initialize dark mode from localStorage
+        if (localStorage.getItem('darkMode') === 'true' || (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 
     <style>
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900" x-data="{ darkMode: false, sidebarOpen: true }">
+<body class="bg-gray-50 dark:bg-gray-900"
+      x-data="{
+          darkMode: localStorage.getItem('darkMode') === 'true' || (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches),
+          sidebarOpen: true
+      }"
+      x-init="$watch('darkMode', val => {
+          localStorage.setItem('darkMode', val);
+          if (val) {
+              document.documentElement.classList.add('dark')
+          } else {
+              document.documentElement.classList.remove('dark')
+          }
+      })">
 
     <!-- Navigation Bar -->
     <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 fixed w-full z-30 top-0">
@@ -108,7 +132,7 @@
             </div>
 
             <!-- Page Content -->
-            <div th:replace="~{::content}">
+            <div th:replace="${content}">
                 Page content goes here
             </div>
         </main>

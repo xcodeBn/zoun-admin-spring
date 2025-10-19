@@ -53,6 +53,16 @@ public class GenericAdminController {
     }
 
     /**
+     * Add common model attributes to all views.
+     */
+    @ModelAttribute
+    public void addCommonAttributes(Model model) {
+        model.addAttribute("models", modelRegistry.getAllModels());
+        model.addAttribute("basePath", properties.getBasePath());
+        model.addAttribute("appTitle", properties.getAppTitle());
+    }
+
+    /**
      * Dashboard - List all available entities.
      */
     @GetMapping({"", "/"})
@@ -204,7 +214,9 @@ public class GenericAdminController {
             }
 
             // Bind form data to entity
-            entity = formDataBinder.bind(formData, files, entity, metadata.entityClass());
+            @SuppressWarnings("unchecked")
+            Class<Object> entityClass = (Class<Object>) metadata.entityClass();
+            entity = formDataBinder.bind(formData, files, entity, entityClass);
 
             // Save entity
             repository.save(entity);
@@ -212,13 +224,13 @@ public class GenericAdminController {
             redirectAttributes.addFlashAttribute("successMessage",
                     "Successfully saved " + modelName);
 
-            return "redirect:${zoun.admin.ui.base-path:/zoun-admin}/models/" + modelName;
+            return "redirect:" + properties.getBasePath() + "/models/" + modelName;
 
         } catch (Exception e) {
             log.error("Failed to save entity: {}", e.getMessage(), e);
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Failed to save: " + e.getMessage());
-            return "redirect:${zoun.admin.ui.base-path:/zoun-admin}/models/" + modelName + "/new";
+            return "redirect:" + properties.getBasePath() + "/models/" + modelName + "/new";
         }
     }
 
@@ -250,7 +262,7 @@ public class GenericAdminController {
                     "Failed to delete: " + e.getMessage());
         }
 
-        return "redirect:${zoun.admin.ui.base-path:/zoun-admin}/models/" + modelName;
+        return "redirect:" + properties.getBasePath() + "/models/" + modelName;
     }
 
     /**
